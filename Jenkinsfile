@@ -24,7 +24,7 @@ pipeline {
                 echo 'Running SonarQube static code analysis...'
                 script {
                     def scannerHome = tool 'sonar-scanner'
-                    withSonarQubeEnv('SonarQube') {
+                    withSonarQubeEnv {
                         bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
                     }
                 }
