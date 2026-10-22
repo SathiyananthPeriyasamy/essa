@@ -21,14 +21,9 @@ pipeline {
 
         stage('Deploy to EC2 via SSH') {
             steps {
-                sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
-                            set -e
-                            cd /home/ubuntu/essa
-                            git pull origin main
-                            docker compose -f deployed/docker-compose.yml up -d --build
-                        '
+                withCredentials([sshUserPrivateKey(credentialsId: env.SSH_KEY_ID, keyFileVariable: 'KEY_FILE')]) {
+                    bat """
+                        ssh -i "%KEY_FILE%" -o StrictHostKeyChecking=no %EC2_USER%@%EC2_HOST% "cd /home/ubuntu/essa && git pull origin main && docker compose -f deployed/docker-compose.yml up -d --build"
                     """
                 }
             }
@@ -36,11 +31,9 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
-                            docker ps --filter name=essa-frontend
-                        '
+                withCredentials([sshUserPrivateKey(credentialsId: env.SSH_KEY_ID, keyFileVariable: 'KEY_FILE')]) {
+                    bat """
+                        ssh -i "%KEY_FILE%" -o StrictHostKeyChecking=no %EC2_USER%@%EC2_HOST% "docker ps --filter name=essa-frontend"
                     """
                 }
             }
@@ -49,10 +42,10 @@ pipeline {
 
     post {
         always {
-            echo "Pipeline run finished."
+            echo "Pipeline execution finished."
         }
         success {
-            echo "Successfully deployed to EC2! Container running strictly bound to 127.0.0.1."
+            echo "Successfully deployed to EC2! Container is running strictly bound to 127.0.0.1."
         }
         failure {
             echo "Deployment failed. Inspect the console logs above."
