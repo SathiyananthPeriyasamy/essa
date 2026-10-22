@@ -1,0 +1,9 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deployed/Dockerfile
+    container_name: essa-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
