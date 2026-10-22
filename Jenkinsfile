@@ -5,7 +5,7 @@ pipeline {
         // Automatically check GitHub for new commits every 2 minutes
         pollSCM('H/2 * * * *')
     }
-
+    //var
     environment {
         EC2_HOST = '13.126.138.58'
         EC2_USER = 'ubuntu'
