@@ -7,7 +7,7 @@ pipeline {
     }
     //var
     environment {
-        EC2_HOST = '13.126.138.58'
+        EC2_HOST = credentials('ec2-host-ip')
         EC2_USER = 'ubuntu'
         SSH_KEY_ID = 'ec2-ssh-key'
     }
@@ -81,7 +81,7 @@ pipeline {
             echo "Pipeline execution finished."
         }
         success {
-            echo "Successfully deployed to EC2! Live at http://13.126.138.58"
+            echo "Successfully deployed to EC2! Live at http://${EC2_HOST}"
         }
         failure {
             echo "Deployment failed. Inspect the console logs above."
