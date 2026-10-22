@@ -44,6 +44,36 @@ pipeline {
                 }
             }
         }
+
+        stage('Smoke Test') {
+            steps {
+                echo 'Running smoke test: validating HTTP 200 response...'
+                sleep time: 3, unit: 'SECONDS'
+
+                // Test 1: Verify container responds internally on EC2
+                withCredentials([sshUserPrivateKey(credentialsId: env.SSH_KEY_ID, keyFileVariable: 'KEY_FILE')]) {
+                    bat """
+                        icacls "%KEY_FILE%" /inheritance:r
+                        icacls "%KEY_FILE%" /grant:r *S-1-5-18:(F)
+                        icacls "%KEY_FILE%" /grant:r *S-1-5-32-544:(F)
+                        ssh -i "%KEY_FILE%" -o StrictHostKeyChecking=no %EC2_USER%@%EC2_HOST% "curl -s -I http://localhost | grep '200 OK'"
+                    """
+                }
+
+                // Test 2: Verify live endpoint responds with HTTP 200
+                bat """
+                    @echo off
+                    echo Testing live endpoint http://${EC2_HOST}...
+                    curl.exe -s -I http://${EC2_HOST} | findstr "200 OK"
+                    if %ERRORLEVEL% NEQ 0 (
+                        echo [FAIL] Smoke test failed: http://${EC2_HOST} did not return 200 OK
+                        exit /b 1
+                    ) else (
+                        echo [PASS] Smoke test passed: http://${EC2_HOST} is healthy and live!
+                    )
+                """
+            }
+        }
     }
 
     post {
