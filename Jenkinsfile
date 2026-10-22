@@ -51,7 +51,7 @@ pipeline {
             echo "Pipeline execution finished."
         }
         success {
-            echo "Successfully deployed to EC2! Container is running strictly bound to 127.0.0.1."
+            echo "Successfully deployed to EC2! Live at http://13.126.138.58"
         }
         failure {
             echo "Deployment failed. Inspect the console logs above."
