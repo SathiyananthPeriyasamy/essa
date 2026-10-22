@@ -24,7 +24,8 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: env.SSH_KEY_ID, keyFileVariable: 'KEY_FILE')]) {
                     bat """
                         icacls "%KEY_FILE%" /inheritance:r
-                        icacls "%KEY_FILE%" /grant:r "%USERNAME%:(F)"
+                        icacls "%KEY_FILE%" /grant:r *S-1-5-18:(F)
+                        icacls "%KEY_FILE%" /grant:r *S-1-5-32-544:(F)
                         ssh -i "%KEY_FILE%" -o StrictHostKeyChecking=no %EC2_USER%@%EC2_HOST% "cd /home/ubuntu/essa && git pull origin main && docker compose -f deployed/docker-compose.yml up -d --build"
                     """
                 }
@@ -36,7 +37,8 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: env.SSH_KEY_ID, keyFileVariable: 'KEY_FILE')]) {
                     bat """
                         icacls "%KEY_FILE%" /inheritance:r
-                        icacls "%KEY_FILE%" /grant:r "%USERNAME%:(F)"
+                        icacls "%KEY_FILE%" /grant:r *S-1-5-18:(F)
+                        icacls "%KEY_FILE%" /grant:r *S-1-5-32-544:(F)
                         ssh -i "%KEY_FILE%" -o StrictHostKeyChecking=no %EC2_USER%@%EC2_HOST% "docker ps --filter name=essa-frontend"
                     """
                 }
